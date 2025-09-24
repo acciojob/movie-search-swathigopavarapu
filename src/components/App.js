@@ -7,59 +7,62 @@ const App = () => {
   const [error, setError] = useState(""); 
 
   const API_KEY = "99eb9fd1";
+
   const handleSearch = () => {
-  if (!query.trim()) return;
+    if (!query.trim()) return;
 
-  fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&s=${query}`)
-    .then(res => res.json())
-    .then(data => {
-      if (data.Response === "True") {
-        setMovies(data.Search);
-        setError("");
-      } else {
+    fetch(`https://www.omdbapi.com/?apikey=${API_KEY}&s=${query}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.Response === "True") {
+          setMovies(data.Search);
+          setError("");
+        } else {
+          setMovies([]);
+          setError("Invalid movie name. Please try again.");
+        }
+      })
+      .catch(() => {
         setMovies([]);
-        setError("Invalid movie name. Please try again.");
-      }
-    })
-    .catch(() => {
-      setMovies([]);
-      setError("Something went wrong. Please try again.");
-    });
-};
-
-
- 
-
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") handleSearch();
+        setError("Something went wrong. Please try again.");
+      });
   };
 
   return (
     <div className="app">
       <h1>Movie Search</h1>
-      <div className="search-bar">
+
+      {/* Form for Cypress test */}
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          handleSearch();
+        }}
+      >
         <input
           type="text"
           value={query}
           placeholder="Search movies..."
           onChange={(e) => setQuery(e.target.value)}
-          onKeyPress={handleKeyPress}
         />
-        <button onClick={handleSearch}>Search</button>
-      </div>
+        <button type="submit">Search</button>
+      </form>
+
       {error && <p className="error">{error}</p>}
-      <div className="movie-list">
+
+      {/* Movie list as ul/li for Cypress test */}
+      <ul className="movie-list">
         {movies.map((movie) => (
-          <div key={movie.imdbID} className="movie-card">
-            <img 
+          <li key={movie.imdbID} className="movie-card">
+            <img
               src={movie.Poster !== "N/A" ? movie.Poster : "https://via.placeholder.com/150"}
-              alt={movie.Title} 
+              alt={movie.Title}
             />
             <h3>{movie.Title}</h3>
             <p>{movie.Year}</p>
-          </div>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   );
 };
